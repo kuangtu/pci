@@ -1,3 +1,4 @@
+#coding:utf-8
 # A dictionary of movie critics and their ratings of a small
 # set of movies
 critics={'Lisa Rose': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.5,
@@ -26,7 +27,8 @@ def sim_distance(prefs,person1,person2):
   # Get the list of shared_items
   si={}
   for item in prefs[person1]: 
-    if item in prefs[person2]: si[item]=1
+    if item in prefs[person2]:
+      si[item]=1
 
   # if they have no ratings in common, return 0
   if len(si)==0: return 0
@@ -42,7 +44,11 @@ def sim_pearson(prefs,p1,p2):
   # Get the list of mutually rated items
   si={}
   for item in prefs[p1]: 
-    if item in prefs[p2]: si[item]=1
+    if item in prefs[p2]:
+      si[item]=1
+
+  #si中为共同包含的tiems，按照字典进行组织，values为１
+  # print si
 
   # if they are no ratings in common, return 0
   if len(si)==0: return 0
@@ -70,11 +76,22 @@ def sim_pearson(prefs,p1,p2):
 
   return r
 
+def sim_tanimoto(a, b):
+  c = [ v for v in a if v in b]
+  print c
+  print a
+  print b
+  print len(c)/(len(a) + len(b) - len(c))
+  return float(len(c))/(len(a) + len(b) - len(c))
+
+
 # Returns the best matches for person from the prefs dictionary. 
 # Number of results and similarity function are optional params.
 def topMatches(prefs,person,n=5,similarity=sim_pearson):
   scores=[(similarity(prefs,person,other),other) 
                   for other in prefs if other!=person]
+  #对于person和其他人相似品味的度量
+  #计算person和其他人共同包含的items之间的距离（相关度）
   scores.sort()
   scores.reverse()
   return scores[0:n]
@@ -87,6 +104,7 @@ def getRecommendations(prefs,person,similarity=sim_pearson):
   for other in prefs:
     # don't compare me to myself
     if other==person: continue
+    #先计算person和其他人的相似度
     sim=similarity(prefs,person,other)
 
     # ignore scores of zero or lower
@@ -97,11 +115,13 @@ def getRecommendations(prefs,person,similarity=sim_pearson):
       if item not in prefs[person] or prefs[person][item]==0:
         # Similarity * Score
         totals.setdefault(item,0)
+        #对于其他人的影评需要乘以相似度
         totals[item]+=prefs[other][item]*sim
         # Sum of similarities
         simSums.setdefault(item,0)
         simSums[item]+=sim
 
+  print totals
   # Create the normalized list
   rankings=[(total/simSums[item],item) for item,total in totals.items()]
 
