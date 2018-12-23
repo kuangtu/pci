@@ -174,6 +174,7 @@ import random
 
 def kcluster(rows,distance=pearson,k=4):
   # Determine the minimum and maximum values for each point
+  #一行中包含了所有的单词
   ranges=[(min([row[i] for row in rows]),max([row[i] for row in rows])) 
   for i in range(len(rows[0]))]
 
@@ -184,11 +185,11 @@ def kcluster(rows,distance=pearson,k=4):
   #相当于随机产生另外k个blog
 
   #ranges[i][1] - ranges[i][0]之间，即：最大最小值之间
+  #每个单词最大，最小值之间选择一个随机值
+  #选择了k组
   clusters=[[random.random()*(ranges[i][1]-ranges[i][0])+ranges[i][0] 
   for i in range(len(rows[0]))] for j in range(k)]
 
-  print len(clusters)
-  
   lastmatches=None
   for t in range(100):
     #初始时认为随机生成的k个blog是中心点
@@ -205,6 +206,8 @@ def kcluster(rows,distance=pearson,k=4):
         d=distance(clusters[i],row)
         if d<distance(clusters[bestmatch],row): bestmatch=i
       bestmatches[bestmatch].append(j)
+      #其中，bestmatches产生了k个list，每个list中包含了与该对应
+      #结点最近的row
 
     # If the results are the same as last time, this is complete
     if bestmatches==lastmatches: break
@@ -213,8 +216,8 @@ def kcluster(rows,distance=pearson,k=4):
     # Move the centroids to the average of their members
     for i in range(k):
       #把中心点移到所有成员的平均位置
+      #avgs是所有单词的一个平均值
       avgs=[0.0]*len(rows[0])
-      print avgs
       if len(bestmatches[i])>0:
         #获取k个随机分组中包含的所有“点”
         for rowid in bestmatches[i]:

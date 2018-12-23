@@ -31,10 +31,13 @@ def getBlogData():
     # print lowestpair[0]
 
 def getKCluster():
+    #第一是博客名称，第二是单词本身，第三是词频
     blognames, words, data = clusters.readfile('blogdata.txt')
     # num = [data[i][0] for i in range(len(blognames))]
     # print num
 
+    #data是list，每个元素是一篇博客中，对应单词频度
+    #k为聚类的个数
     kclust = clusters.kcluster(data, k=10)
     print kclust
 
